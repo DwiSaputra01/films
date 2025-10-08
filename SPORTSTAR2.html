@@ -1,86 +1,100 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Sportstars 2 - Zona Siaran TV</title>
-    <meta name='viewport' content='width=device-width, initial-scale=1.0'/>
-    <script src='https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.3.3/shaka-player.ui.min.js' crossorigin='anonymous'></script>
-    <link rel='stylesheet' href='assets/styleshaka.css' crossorigin='anonymous'/>
-    <link rel='stylesheet' href='assets/style.css' crossorigin='anonymous'/>
+  <title>Sportstars 2 - Zona Siaran TV</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.3.3/shaka-player.ui.min.js" crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="assets/styleshaka.css" crossorigin="anonymous"/>
+  <link rel="stylesheet" href="assets/style.css" crossorigin="anonymous"/>
 </head>
 
-<body bgcolor='black' style='margin:0' oncontextmenu='return false' onkeydown='return false' onmousedown='return false'>
+<body bgcolor="black" style="margin:0" oncontextmenu="return false" onkeydown="return false" onmousedown="return false">
 
-    <div id="vidio" data-shaka-player-container style='position:absolute;z-index: -1;top: 0;left: 0;width: 100%; height: 100%;object-fit:fill cover;'>
-        <video autoplay data-shaka-player id='video' poster="img/b.png" style='width:100%;height:100%;'></video>
-        <div class="shaka-controls-container" shown="true">
-            <div class="shaka-scrim-container"></div>
-            <div class="shaka-play-buton-container">
-                <button class="shaka-play-button shaka-no-propagation" ion="pause" aria-abel="Pause"></button>
-		    </div>
-            <div class="shaka-server-side-ad-container"></div>
-            <div class="shaka-bottom-controls shaka-no-propagation">
-                <div class="shaka-ad-controls shaka-hidden">
-                    <div class="shaka-ad-position shaka-hidden">
-                        <span class="shaka-ad-position-span"></span>
-				    </div>
-                    <div class="shaka-ad-counter">
-                        <span class="shaka-ad-counter-span"></span>
-				    </div>
-			    </div>
-                <div class="shaka-controls-button-panel shaka-show-controls-on-mouse-over">
-                    <img src="img/l.png" style='width:15% ;height:15%;' class="shaka-fullscreen-button material-icons-round shaka-tooltip" aria-label="mute">
-			    </div>
-		    </div>
-	    </div>
+  <div id="vidio" data-shaka-player-container style="position:absolute;z-index:-1;top:0;left:0;width:100%;height:100%;object-fit:fill cover;">
+    <video autoplay data-shaka-player id="video" poster="img/b.png" style="width:100%;height:100%;"></video>
+    <div class="shaka-controls-container" shown="true">
+      <div class="shaka-scrim-container"></div>
+      <div class="shaka-play-buton-container">
+        <button class="shaka-play-button shaka-no-propagation" ion="pause" aria-abel="Pause"></button>
+      </div>
+      <div class="shaka-server-side-ad-container"></div>
+      <div class="shaka-bottom-controls shaka-no-propagation">
+        <div class="shaka-ad-controls shaka-hidden">
+          <div class="shaka-ad-position shaka-hidden">
+            <span class="shaka-ad-position-span"></span>
+          </div>
+          <div class="shaka-ad-counter">
+            <span class="shaka-ad-counter-span"></span>
+          </div>
+        </div>
+        <div class="shaka-controls-button-panel shaka-show-controls-on-mouse-over">
+          <img src="img/l.png" style="width:15%;height:15%;" class="shaka-fullscreen-button material-icons-round shaka-tooltip" aria-label="mute">
+        </div>
+      </div>
     </div>
+  </div>
 
-   <script> 
-   async function init() { 
-        const video = document.getElementById('video'); 
-        const ui = video['ui']; 
-        const controls = ui.getControls(); 
-        const player = controls.getPlayer(); 
+<script>
+  async function init() {
+    const video = document.getElementById('video');
+    const ui = video['ui'];
+    const controls = ui.getControls();
+    const player = controls.getPlayer();
 
-        // === URL MPD Sportstars 2 ===
-        const source = 'https://corsproxy.io/?url=https://d3b0v7fggu5zwm.cloudfront.net/out/v1/d2c68a3dfb644808b416bd90dcc92d5f/index.mpd';
+    const originalManifest = 'https://d3b0v7fggu5zwm.cloudfront.net/out/v1/d2c68a3dfb644808b416bd90dcc92d5f/index.mpd';
+    const proxy = 'https://corsproxy.lisa-ai.workers.dev/?url=';
+    const source = proxy + encodeURIComponent(originalManifest);
 
-        // === Konfigurasi DRM ClearKey ===
-        player.configure({
-            drm: {
-                clearKeys: {
-                    '911e72adf36946afbdbb4f80782a8394': '08aec548a851ba64b7172ae7f05cb91c'
-                }
-            }
-        });
-
-        // Referrer & UA spoof untuk konten Vision+
-        player.getNetworkingEngine().registerRequestFilter((type, request) => {
-            if (type === shaka.net.NetworkingEngine.RequestType.MANIFEST ||
-                type === shaka.net.NetworkingEngine.RequestType.SEGMENT) {
-                request.headers['Referer'] = 'https://www.visionplus.id/';
-                request.headers['User-Agent'] = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.181 Safari/537.36';
-            }
-        });
-
-        window.player = player; 
-        window.ui = ui; 
-        player.addEventListener('error', onPlayerErrorEvent); 
-        controls.addEventListener('error', onUIErrorEvent); 
-
-        try {
-            await player.load(source);
-            console.log('Sportstars 2 telah dimuat!');
-        } catch (error) {
-            onPlayerError(error);
+    // DRM ClearKey Sportstars 2
+    player.configure({
+      drm: {
+        clearKeys: {
+          '911e72adf36946afbdbb4f80782a8394': '08aec548a851ba64b7172ae7f05cb91c'
         }
-    } 
+      }
+    });
 
-    function onPlayerErrorEvent(errorEvent) {onPlayerError(errorEvent.detail);} 
-    function onPlayerError(error) {console.error('Error code', error.code, 'object', error);} 
-    function onUIErrorEvent(errorEvent) {onPlayerError(errorEvent.detail);} 
-    function initFailed(errorEvent) {console.error('Unable to load the UI library!');} 
-    document.addEventListener('shaka-ui-loaded', init); 
-    document.addEventListener('shaka-ui-load-failed', initFailed); 
-    </script>
-    
+    // Paksa semua request (manifest & segment) lewat proxy
+    player.getNetworkingEngine().registerRequestFilter((type, request) => {
+      for (let i = 0; i < request.uris.length; i++) {
+        const uri = request.uris[i];
+        if (!uri.startsWith(proxy)) {
+          request.uris[i] = proxy + encodeURIComponent(uri);
+        }
+      }
+      request.headers['Referer'] = 'https://www.visionplus.id/';
+      request.headers['User-Agent'] = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)';
+    });
+
+    window.player = player;
+    window.ui = ui;
+    player.addEventListener('error', onPlayerErrorEvent);
+    controls.addEventListener('error', onUIErrorEvent);
+
+    try {
+      await player.load(source);
+      console.log('✅ Sportstars 2 berhasil dimuat via proxy!');
+    } catch (error) {
+      console.error('❌ Gagal load manifest utama:', error);
+      // fallback ke URL kedua kalau yang pertama error
+      const alt = 'https://fta3-cdn-flr.visionplus.id/out/v1/d2c68a3dfb644808b416bd90dcc92d5f/index.mpd';
+      try {
+        await player.load(proxy + encodeURIComponent(alt));
+        console.log('✅ Fallback Sportstars 2 berhasil dimuat!');
+      } catch (e) {
+        console.error('❌ Fallback juga gagal:', e);
+      }
+    }
+  }
+
+  function onPlayerErrorEvent(e) { onPlayerError(e.detail); }
+  function onPlayerError(error) { console.error('Error code', error.code, 'object', error); }
+  function onUIErrorEvent(e) { onPlayerError(e.detail); }
+  function initFailed(e) { console.error('Unable to load the UI library!', e); }
+
+  document.addEventListener('shaka-ui-loaded', init);
+  document.addEventListener('shaka-ui-load-failed', initFailed);
+</script>
+
+</body>
 </html>
