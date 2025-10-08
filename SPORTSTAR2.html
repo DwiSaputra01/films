@@ -43,7 +43,6 @@
 
     const originalManifest = 'https://d3b0v7fggu5zwm.cloudfront.net/out/v1/d2c68a3dfb644808b416bd90dcc92d5f/index.mpd';
     const proxy = 'https://corsproxy.lisa-ai.workers.dev/?url=';
-    const source = proxy + encodeURIComponent(originalManifest);
 
     // DRM ClearKey Sportstars 2
     player.configure({
@@ -54,10 +53,11 @@
       }
     });
 
-    // Paksa semua request (manifest & segment) lewat proxy
+    // Proxy semua request (manifest & segment) lewat filter
     player.getNetworkingEngine().registerRequestFilter((type, request) => {
       for (let i = 0; i < request.uris.length; i++) {
         const uri = request.uris[i];
+        // hanya proxy kalau URL belum diproxy
         if (!uri.startsWith(proxy)) {
           request.uris[i] = proxy + encodeURIComponent(uri);
         }
@@ -72,14 +72,14 @@
     controls.addEventListener('error', onUIErrorEvent);
 
     try {
-      await player.load(source);
-      console.log('✅ Sportstars 2 berhasil dimuat via proxy!');
+      // 🟡 pakai URL manifest original, biar tidak double proxy
+      await player.load(originalManifest);
+      console.log('✅ Sportstars 2 berhasil dimuat (proxy filter aktif)');
     } catch (error) {
       console.error('❌ Gagal load manifest utama:', error);
-      // fallback ke URL kedua kalau yang pertama error
       const alt = 'https://fta3-cdn-flr.visionplus.id/out/v1/d2c68a3dfb644808b416bd90dcc92d5f/index.mpd';
       try {
-        await player.load(proxy + encodeURIComponent(alt));
+        await player.load(alt);
         console.log('✅ Fallback Sportstars 2 berhasil dimuat!');
       } catch (e) {
         console.error('❌ Fallback juga gagal:', e);
